@@ -9,11 +9,11 @@ const BUFFER_SIZE int64 = 4194304 //1MB
 
 //Write_par_to_disk_end write the data in a partition to the end of the disk
 func WriteParToDiskEnd(part, disk string) {
-	partFile, err := os.Open(part)
+	partFile, err := os.OpenFile(part, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if Check(err) {
 		return
 	}
-	diskFile, err := os.Open(disk)
+	diskFile, err := os.OpenFile(disk, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if Check(err) {
 		return
 	}
@@ -59,5 +59,5 @@ func WriteParToDiskEnd(part, disk string) {
 		}
 		partEnd -= offset
 	}
-	fmt.Println("Write completed. From ", part, " to ", disk)
+	fmt.Println("Write completed. From ", part, " to the end of ", disk)
 }
