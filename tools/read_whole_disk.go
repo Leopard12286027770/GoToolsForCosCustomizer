@@ -11,7 +11,7 @@ func Read_whole_disk(disk string) {
 	if Check(err) {
 		return
 	}
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 4194304) //4096x1024
 	num, err := file.Read(buffer)
 	if Check(err) {
 		return
@@ -22,7 +22,7 @@ func Read_whole_disk(disk string) {
 	for {
 		num, err = file.Read(buffer)
 		sum += num
-		if num < 1024 {
+		if num < 4194304 {
 			fmt.Println("total ", sum, " B")
 			file.Close()
 			return
