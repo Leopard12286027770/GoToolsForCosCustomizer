@@ -2,7 +2,8 @@ package tools
 
 import (
 	"fmt"
-	"syscall"
+
+	syscall "golang.org/x/sys/unix"
 )
 
 //Read_disk_size read disk size
