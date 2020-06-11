@@ -6,8 +6,7 @@ import (
 )
 
 //Read_whole_disk to read whole disk output size in B
-func Read_whole_disk() {
-	disk := "/dev/sdb1"
+func Read_whole_disk(disk string) {
 	file, err := os.Open(disk)
 	if Check(err) {
 		return

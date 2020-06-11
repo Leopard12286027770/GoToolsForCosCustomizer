@@ -19,8 +19,10 @@ func Read_disk_size(disk string) {
 	ava := stat.Bavail * uint64(stat.Bsize)
 	fmt.Println("Disk: ", disk)
 
-	fmt.Println("Disk size: ", size)
-	fmt.Println("Disk available: ", ava)
+	fmt.Println("Bsize: ", uint64(stat.Bsize))
+
+	fmt.Println("Disk size: ", stat.Blocks)
+	fmt.Println("Disk available: ", stat.Bavail)
 	fmt.Println("Disk used: ", size-ava)
 	fmt.Println()
 
