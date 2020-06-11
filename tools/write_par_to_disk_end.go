@@ -59,4 +59,5 @@ func WriteParToDiskEnd(part, disk string) {
 		}
 		partEnd -= offset
 	}
+	fmt.Println("Write completed. From ", part, " to ", disk)
 }
