@@ -5,7 +5,7 @@ import (
 	"syscall"
 )
 
-//Read_disk_size read disk size
+//Read_disk_size read disk size, only at mount point
 func Read_disk_size(disk string) {
 	var stat syscall.Statfs_t
 	err := syscall.Statfs(disk, &stat)

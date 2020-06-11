@@ -1,15 +1,14 @@
 package tools
 
 import (
-	"fmt"
 	"os"
 )
 
 //Seek_disk_end use seek to find the size of disk
-func Seek_disk_end(disk string) {
+func Seek_disk_end(disk string) (int, error) {
 	file, err := os.Open(disk)
 	if Check(err) {
-		return
+		return -1, err
 	}
 	// Whence is the point of reference for offset
 	// 0 : Beginning of file
@@ -17,9 +16,9 @@ func Seek_disk_end(disk string) {
 	// 2 : End of file
 	pos, err := file.Seek(0, 2)
 	if Check(err) {
-		return
+		return -1, err
 	}
-	fmt.Println(disk, ":")
-	fmt.Println("Disk end position: ", pos)
+
+	return int(pos), nil
 
 }
