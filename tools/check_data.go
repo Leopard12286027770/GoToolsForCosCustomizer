@@ -18,7 +18,7 @@ func CheckData(part1, part2 string) {
 	defer part1File.Close()
 	defer part2File.Close()
 
-	_, err = part1File.Seek((2048 * 512), 0)
+	_, err = part1File.Seek(7516192768, 0)
 	if Check(err) {
 		return
 	}
