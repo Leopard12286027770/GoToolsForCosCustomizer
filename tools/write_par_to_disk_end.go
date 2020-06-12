@@ -29,7 +29,7 @@ func WriteParToDiskEnd(part, disk string) {
 	if Check(err) {
 		return
 	}
-	diskEnd, err := diskFile.Seek(0, 2)
+	diskEnd, err := diskFile.Seek(-1073741824, 2) //last but 1 G
 	if Check(err) {
 		return
 	}
@@ -39,6 +39,7 @@ func WriteParToDiskEnd(part, disk string) {
 		fmt.Println("no enough space in disk")
 		return
 	}
+	diskStart := diskEnd - partEnd
 
 	buffer := make([]byte, BUFFER_SIZE)
 	for partEnd > 0 {
@@ -60,4 +61,5 @@ func WriteParToDiskEnd(part, disk string) {
 		partEnd -= offset
 	}
 	fmt.Println("Write completed. From ", part, " to the end of ", disk)
+	fmt.Println("Start position on disk:", diskStart, "Byte")
 }
