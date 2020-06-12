@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+const M_BIT int64 = 1048576       //1MB
 const BUFFER_SIZE int64 = 1048576 //1MB
 
 //Write_par_to_disk_end write the data in a partition to the end of the disk
@@ -29,7 +30,7 @@ func WriteParToDiskEnd(part, disk string) {
 	if Check(err) {
 		return
 	}
-	diskEnd, err := diskFile.Seek(-1073741824, 2) //last but 1 G
+	diskEnd, err := diskFile.Seek(-M_BIT, 2) //last but 1 MB
 	if Check(err) {
 		return
 	}
@@ -39,7 +40,6 @@ func WriteParToDiskEnd(part, disk string) {
 		fmt.Println("no enough space in disk")
 		return
 	}
-	diskStart := diskEnd - partEnd
 
 	buffer := make([]byte, BUFFER_SIZE)
 	for partEnd > 0 {
@@ -63,10 +63,11 @@ func WriteParToDiskEnd(part, disk string) {
 		diskFile.Seek(-offset, 1)
 		partEnd -= offset
 	}
-	diskStart, err = diskFile.Seek(0, 1)
+	diskStart, err := diskFile.Seek(0, 1)
 	if Check(err) {
 		return
 	}
 	fmt.Println("Write completed. From ", part, " to the end of ", disk)
-	fmt.Println("Start position on disk:", diskStart, "Byte")
+	fmt.Println("Start position on disk:", diskStart/512, "Byte")
+	fmt.Println("End position on disk:", diskEnd/512, "Byte")
 }
