@@ -29,6 +29,7 @@ func CheckData(part1, part2 string) {
 	size := (1024 * 1024)
 	buf1 := make([]byte, size)
 	buf2 := make([]byte, size)
+	cnt := 0
 	for {
 		_, err = part1File.Read(buf1)
 		if Check(err) {
@@ -38,9 +39,10 @@ func CheckData(part1, part2 string) {
 		if Check(err) {
 			return
 		}
+		cnt += n2
 		for i := 0; i < n2; i++ {
 			if buf1[i] != buf2[i] {
-				fmt.Println("wrong data!!!!!")
+				fmt.Println("wrong data!!!!!  at", cnt)
 				return
 			}
 			if n2 < size {
