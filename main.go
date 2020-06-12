@@ -1,7 +1,14 @@
 package main
 
-import "GoToolsForCosCustomizer/tools"
+import (
+	"GoToolsForCosCustomizer/tools"
+	"fmt"
+)
 
 func main() {
-	tools.WriteParToDiskEnd("/dev/sdb1", "/dev/sdb")
+	out, err := tools.MovePartition("/dev/sdb", "1", "+1G")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(out)
 }
