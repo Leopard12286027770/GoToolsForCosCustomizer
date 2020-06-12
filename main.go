@@ -8,5 +8,6 @@ func main() {
 	// 	fmt.Println(err.Error())
 	// }
 	// fmt.Println(out)
-	tools.ExtendPartition("sdb", "1", 1000)
+	tools.ExtendPartition("/dev/sdb", "1", 1000)
+
 }
