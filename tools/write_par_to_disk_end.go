@@ -60,6 +60,10 @@ func WriteParToDiskEnd(part, disk string) {
 		}
 		partEnd -= offset
 	}
+	diskStart, err = diskFile.Seek(0, 1)
+	if Check(err) {
+		return
+	}
 	fmt.Println("Write completed. From ", part, " to the end of ", disk)
 	fmt.Println("Start position on disk:", diskStart, "Byte")
 }
