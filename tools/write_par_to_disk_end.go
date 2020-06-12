@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-const BUFFER_SIZE int64 = 4194304 //1MB
+const BUFFER_SIZE int64 = 1048576 //1MB
 
 //Write_par_to_disk_end write the data in a partition to the end of the disk
 func WriteParToDiskEnd(part, disk string) {
@@ -58,6 +58,9 @@ func WriteParToDiskEnd(part, disk string) {
 		if Check(err) {
 			return
 		}
+		//after read or write, pointer goes forward, roll backwards again
+		partFile.Seek(-offset, 1)
+		diskFile.Seek(-offset, 1)
 		partEnd -= offset
 	}
 	diskStart, err = diskFile.Seek(0, 1)
