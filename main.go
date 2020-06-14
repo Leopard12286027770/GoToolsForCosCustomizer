@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoToolsForCosCustomizer/tools"
+	"GoToolsForCosCustomizer/util"
 	"fmt"
 )
 
@@ -12,9 +12,13 @@ func main() {
 	// }
 	// fmt.Println(out)
 	// tools.ExtendPartition("/dev/sdb", "1", 8408917)
-	start, err := tools.ReadPartitionStart("/dev/sdb", "1")
+	// start, err := tools.ReadPartitionStart("/dev/sdb", "1")
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// }
+	// fmt.Println(start)
+	err := util.ExtendOemPartition("/dev/sdb", "3", "1", "1G")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(start)
 }

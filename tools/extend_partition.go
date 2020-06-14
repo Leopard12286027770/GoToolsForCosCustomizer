@@ -11,36 +11,37 @@ import (
 )
 
 //ExtendPartition extends a partition to a specific end sector
-func ExtendPartition(disk, partNum string, end int) {
+func ExtendPartition(disk, partNum string, end int) error {
 	//dump partition table to a file
 	cmd := string("sfdisk --dump ") + disk + " > extend_partition_tmp"
 	err := exec.Command("/bin/bash", "-c", cmd).Run()
 	if Check(err) {
-		return
+		return err
 	}
 	defer os.Remove("extend_partition_tmp")
 	partName := disk + partNum
 
 	err = editPartitionTableFile("extend_partition_tmp", partName, end)
 	if Check(err) {
-		return
+		return err
 	}
 
 	//write partition table back
 	cmd = "sfdisk " + disk + " < " + " extend_partition_tmp "
 	err = exec.Command("/bin/bash", "-c", cmd).Run()
 	if Check(err) {
-		return
+		return err
 	}
-	fmt.Println(partName, "extension completed")
+	fmt.Println("Completed extending", partName)
 
 	//resize file system in the partition
 	cmd = "resize2fs " + partName
 	err = exec.Command("/bin/bash", "-c", cmd).Run()
 	if Check(err) {
-		return
+		return err
 	}
-	fmt.Println("file system of " + partName + " updated")
+	fmt.Println("Completed updating file system of ", partName)
+	return nil
 }
 
 //change partition table file to extend partition

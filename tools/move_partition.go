@@ -17,5 +17,6 @@ func MovePartition(disk, partNum, dest string) error {
 		fmt.Println("Error when moving partition")
 		return err
 	}
+	fmt.Println("Completed moving ", disk, partNum)
 	return nil
 }
