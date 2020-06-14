@@ -10,13 +10,12 @@ import (
 //for now it takes disk name like /dev/sda
 //partition number like 2
 //destination like 2048, +5G or -200M
-func MovePartition(disk, partNum, dest string) (string, error) {
-	//echo '-1G,' | sudo sfdisk --move-data /dev/sdb -N 2
+func MovePartition(disk, partNum, dest string) error {
 	cmd := "echo " + dest + " | sudo sfdisk --move-data " + disk + " -N " + partNum
-	out, err := exec.Command("/bin/bash", "-c", cmd).Output()
+	err := exec.Command("/bin/bash", "-c", cmd).Run()
 	if Check(err) {
 		fmt.Println("Error when moving partition")
-		return "", err
+		return err
 	}
-	return string(out), nil
+	return nil
 }
