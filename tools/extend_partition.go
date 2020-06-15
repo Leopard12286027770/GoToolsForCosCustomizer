@@ -5,49 +5,58 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 )
 
 //ExtendPartition extends a partition to a specific end sector
 func ExtendPartition(disk, partNum string, end int) error {
+	partName := disk + partNum
+
 	//dump partition table to a file
 	cmd := string("sfdisk --dump ") + disk + " > extend_partition_tmp"
-	err := exec.Command("/bin/bash", "-c", cmd).Run()
-	if Check(err) {
+	err := ExecCmdToStdout(cmd)
+	if Check(err, cmd) {
 		return err
 	}
 	defer os.Remove("extend_partition_tmp")
-	partName := disk + partNum
 
 	err = editPartitionTableFile("extend_partition_tmp", partName, end)
-	if Check(err) {
+	if Check(err, "editing partition table file of "+partName+" to ending sector at: "+strconv.Itoa(end)) {
 		return err
 	}
 
 	//write partition table back
 	cmd = "sfdisk " + disk + " < " + " extend_partition_tmp "
-	err = exec.Command("/bin/bash", "-c", cmd).Run()
-	if Check(err) {
+	err = ExecCmdToStdout(cmd)
+	if Check(err, cmd) {
 		return err
 	}
-	fmt.Println("Completed extending", partName)
+	fmt.Printf("\nCompleted extending %s\n\n", partName)
 
-	//resize file system in the partition
-	cmd = "resize2fs " + partName
-	err = exec.Command("/bin/bash", "-c", cmd).Run()
-	if Check(err) {
+	// check and repair file system in the partition
+	cmd = "e2fsck -fp " + partName
+	err = ExecCmdToStdout(cmd)
+	if Check(err, cmd) {
 		return err
 	}
-	fmt.Println("Completed updating file system of ", partName)
+	fmt.Printf("\nCompleted checking file system of %s\n\n", partName)
+
+	// resize file system in the partition
+	cmd = "resize2fs " + partName
+	err = ExecCmdToStdout(cmd)
+	if Check(err, cmd) {
+		return err
+	}
+
+	fmt.Printf("\nCompleted updating file system of %s\n\n", partName)
 	return nil
 }
 
 //change partition table file to extend partition
 func editPartitionTableFile(fileName, partName string, end int) error {
 	in, err := ioutil.ReadFile(fileName)
-	if Check(err) {
+	if Check(err, "cannot read partition table file") {
 		return err
 	}
 
@@ -68,7 +77,7 @@ func editPartitionTableFile(fileName, partName string, end int) error {
 					if len(word) > 3 { //a valid sector number has at least 4 digits
 						mode = 2
 						start, err = strconv.Atoi(word[:len(word)-1]) //a comma at the end
-						if Check(err) {
+						if Check(err, "cannot convert start sector to int") {
 							return err
 						}
 					}
@@ -80,7 +89,7 @@ func editPartitionTableFile(fileName, partName string, end int) error {
 					if len(word) > 3 { //a valid sector number has at least 4 digits
 
 						size, err := strconv.Atoi(word[:len(word)-1]) //a comma at the end
-						if Check(err) {
+						if Check(err, "cannot convert size to int") {
 							return err
 						}
 						if end-start+1 <= size {
@@ -110,7 +119,7 @@ func editPartitionTableFile(fileName, partName string, end int) error {
 	//recreate the partition table file
 	changed := strings.Join(lines, "\n")
 	err = ioutil.WriteFile(fileName, []byte(changed), 0644)
-	if Check(err) {
+	if Check(err, "cannot write to partition table file") {
 		return err
 	}
 	return nil

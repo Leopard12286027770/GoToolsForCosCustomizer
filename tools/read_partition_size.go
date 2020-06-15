@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-//ReadPartitionStart reads the start sector of a partition
-func ReadPartitionStart(disk, partNum string) (int, error) {
+//ReadPartitionSize reads the size of a partition (unit:sectors of 512 Bytes)
+func ReadPartitionSize(disk, partNum string) (int, error) {
 	//dump partition table and grep the line
 	partName := disk + partNum
 	cmd := string("sfdisk --dump ") + disk + " |grep " + partName
@@ -19,20 +19,20 @@ func ReadPartitionStart(disk, partNum string) (int, error) {
 	if len(line) < 4 { //not find a valid info line
 		return -1, errors.New("cannot find partition " + partName)
 	}
-	start := -1
+	size := -1
 	ls := strings.Split(string(line), " ")
 	mode := 0
 	for _, word := range ls {
 		switch mode {
-		case 0: //looking for start sector
-			if word == "start=" {
+		case 0: //looking for size
+			if word == "size=" {
 				mode = 1
 			}
 		case 1:
-			if len(word) > 3 { //a valid sector number has at least 4 digits
+			if len(word) > 0 { //a valid size number has at least 1 digits
 				mode = 2
-				start, err = strconv.Atoi(word[:len(word)-1]) //a comma at the end
-				if Check(err, "cannot covert start sector to int") {
+				size, err = strconv.Atoi(word[:len(word)-1]) //a comma at the end
+				if Check(err, "cannot covert size sector to int") {
 					return 0, err
 				}
 			}
@@ -43,8 +43,8 @@ func ReadPartitionStart(disk, partNum string) (int, error) {
 			break
 		}
 	}
-	if start == -1 {
+	if size == -1 {
 		return -1, errors.New("Error: error in looking for partition")
 	}
-	return start, nil
+	return size, nil
 }

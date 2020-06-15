@@ -2,6 +2,7 @@ package util
 
 import (
 	"GoToolsForCosCustomizer/tools"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -11,10 +12,25 @@ import (
 //Finally resize the oem partition to 1 sector before the new stateful partition
 //oemSize can be the number of sectors (without unit) or size like "3G"
 func ExtendOemPartition(disk, statePartNum, oemPartNum, oemSize string) error {
+	//read original size of OEM partition
+	oriOemSize, err := tools.ReadPartitionSize(disk, oemPartNum)
+	if err != nil {
+		return err
+	}
+	oriOemSizeBytes := oriOemSize * 512 //change unit to bytes
+	newOemSizeBytes, err := tools.ConvertSizeToBytes(oemSize)
+
+	if err != nil {
+		return err
+	}
+
+	if newOemSizeBytes <= oriOemSizeBytes {
+		return errors.New("Error: oemSize: " + strconv.Itoa(newOemSizeBytes) + " bytes is not larger than the original OEM partition size: " + strconv.Itoa(oriOemSizeBytes) + " bytes")
+	}
+
 	//record the original start sector of the stateful partition
 	oriStartSector, err := tools.ReadPartitionStart(disk, statePartNum)
 	if err != nil {
-
 		return err
 	}
 
@@ -30,7 +46,7 @@ func ExtendOemPartition(disk, statePartNum, oemPartNum, oemSize string) error {
 		return err
 	}
 
-	//read the new start of the stateful partition
+	//record the new start sector of the stateful partition
 	newStartSector, err := tools.ReadPartitionStart(disk, statePartNum)
 	if err != nil {
 
@@ -38,10 +54,10 @@ func ExtendOemPartition(disk, statePartNum, oemPartNum, oemSize string) error {
 	}
 
 	//extend the oem partition
-	err = tools.ExtendPartition(disk, oemPartNum, newStartSector-2)
+	err = tools.ExtendPartition(disk, oemPartNum, newStartSector-1)
 	if err != nil {
 		return err
 	}
-	fmt.Println("OEM partition extended")
+	fmt.Printf("\nCompleted extending OEM partition\n")
 	return nil
 }

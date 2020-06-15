@@ -2,7 +2,6 @@ package tools
 
 import (
 	"fmt"
-	"os/exec"
 )
 
 //MovePartitionPlus move a partition to a start sector
@@ -12,11 +11,10 @@ import (
 //destination like 2048, +5G or -200M
 func MovePartition(disk, partNum, dest string) error {
 	cmd := "echo " + dest + " | sudo sfdisk --move-data " + disk + " -N " + partNum
-	err := exec.Command("/bin/bash", "-c", cmd).Run()
-	if Check(err) {
-		fmt.Println("Error when moving partition")
+	err := ExecCmdToStdout(cmd)
+	if Check(err, cmd) {
 		return err
 	}
-	fmt.Println("Completed moving ", disk, partNum)
+	fmt.Printf("\nCompleted moving %s \n\n", (disk + partNum))
 	return nil
 }
