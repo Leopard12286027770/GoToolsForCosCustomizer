@@ -12,13 +12,15 @@ import (
 //Finally resize the oem partition to 1 sector before the new stateful partition
 //oemSize can be the number of sectors (without unit) or size like "3G"
 func ExtendOemPartition(disk, statePartNum, oemPartNum, oemSize string) error {
+	//read new size of OEM partition
+	newOemSizeBytes, err := tools.ConvertSizeToBytes(oemSize)
+
 	//read original size of OEM partition
 	oriOemSize, err := tools.ReadPartitionSize(disk, oemPartNum)
 	if err != nil {
 		return err
 	}
 	oriOemSizeBytes := oriOemSize * 512 //change unit to bytes
-	newOemSizeBytes, err := tools.ConvertSizeToBytes(oemSize)
 
 	if err != nil {
 		return err
